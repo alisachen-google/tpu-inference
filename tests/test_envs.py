@@ -64,6 +64,7 @@ def test_boolean_env_vars(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("USE_MOE_EP_KERNEL", "0")
     monkeypatch.setenv("LAYOUT_Q_PROJ_AS_NDH", "0")
     monkeypatch.setenv("USE_BATCHED_RPA_KERNEL", "0")
+    monkeypatch.setenv("KV_CACHE_PERSIST_ACROSS_WEIGHT_SYNC", "0")
     monkeypatch.setenv("DISABLE_WEIGHT_REQUANTIZATION", "0")
 
     # Test SKIP_JAX_PRECOMPILE (default False)
@@ -111,6 +112,11 @@ def test_boolean_env_vars(monkeypatch: pytest.MonkeyPatch):
     assert envs.USE_BATCHED_RPA_KERNEL is False
     monkeypatch.setenv("USE_BATCHED_RPA_KERNEL", "1")
     assert envs.USE_BATCHED_RPA_KERNEL is True
+
+    # Test KV_CACHE_PERSIST_ACROSS_WEIGHT_SYNC (default False)
+    assert envs.KV_CACHE_PERSIST_ACROSS_WEIGHT_SYNC is False
+    monkeypatch.setenv("KV_CACHE_PERSIST_ACROSS_WEIGHT_SYNC", "1")
+    assert envs.KV_CACHE_PERSIST_ACROSS_WEIGHT_SYNC is True
 
 
 def test_boolean_env_vars_string_values(monkeypatch: pytest.MonkeyPatch):
@@ -190,6 +196,7 @@ def test_integer_env_vars(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("NUM_SLICES", "1")
     monkeypatch.delenv("REQUANTIZE_BLOCK_SIZE", raising=False)
     monkeypatch.delenv("MOE_REQUANTIZE_BLOCK_SIZE", raising=False)
+    monkeypatch.delenv("CONTINUE_DECODE_EOS_CHECK_INTERVAL", raising=False)
 
     assert envs.PYTHON_TRACER_LEVEL == 1
     monkeypatch.setenv("PYTHON_TRACER_LEVEL", "3")
@@ -213,6 +220,11 @@ def test_integer_env_vars(monkeypatch: pytest.MonkeyPatch):
     assert envs.MOE_REQUANTIZE_BLOCK_SIZE is None
     monkeypatch.setenv("MOE_REQUANTIZE_BLOCK_SIZE", "512")
     assert envs.MOE_REQUANTIZE_BLOCK_SIZE == 512
+
+    # Test CONTINUE_DECODE_EOS_CHECK_INTERVAL (default 1 = stock every-step check)
+    assert envs.CONTINUE_DECODE_EOS_CHECK_INTERVAL == 1
+    monkeypatch.setenv("CONTINUE_DECODE_EOS_CHECK_INTERVAL", "8")
+    assert envs.CONTINUE_DECODE_EOS_CHECK_INTERVAL == 8
 
 
 def test_model_impl_type_choices(monkeypatch: pytest.MonkeyPatch):
